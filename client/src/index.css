@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+::-webkit-scrollbar {
+  width: 0.7em;
+  height: 1em;
+}
+
+::-webkit-scrollbar-track {
+  /* background: hsla(120, 75%, 43%, 0.7); */
+  border-radius: 100vw;
+  margin-block: 0em;
+}
+
+::-webkit-scrollbar-thumb {
+  /* background: linear-gradient(rgb(93, 95, 119), rgb(92, 92, 161)); */
+  /* background: hsl(120 100% 20% / 1); */
+  /* border: 0.2em solid hsla(120, 75%, 43%, 0.5); */
+  border-radius: 100vw;
+  background-color: gray;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  /* background: hsl(120 100% 15% / 1); */
+  background-color: rgb(85, 85, 85);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #1a1a1a;
+  color: white;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+iframe#webpack-dev-server-client-overlay {  display: none !important;  }
+
+
+
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+
+  /* font-family: Arial, Helvetica, sans-serif; */
+}
+
+.resizable-x,
+.resizable-y {
+  display: flex;
+  overflow: hidden;
+}
+
+.resizable-x {
+  height: 100%;
+}
+
+/* .resizable-y {
+  flex-direction: column;
+} */
+
+.resizer-x {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+  padding: 1px;
+}
+
+.resizer-x {
+  z-index: 2;
+  cursor: col-resize;
+}
+.resizer-x::before,
+.resizer-x::after {
+  content: "";
+  width: 2px;
+  height: 16px;
+  margin: 2px;
+  background: lightgray;
+}
+
+.resizer-y {
+  z-index: 1;
+  cursor: row-resize;
+  flex-direction: column;
+}
+.resizer-y::before,
+.resizer-y::after {
+  content: "";
+  width: 16px;
+  height: 2px;
+  margin: 2px;
+  background: lightgray;
+}
+
