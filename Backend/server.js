@@ -4,6 +4,10 @@ const http = require('http');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { Server } = require('socket.io');
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://code-sync-live-jrnx-b537es1rx-sakshi-s-projects-f41a1176.vercel.app"
+];
 
 // Import routes and middleware
 const authRoutes = require('./routes/auth');
@@ -19,14 +23,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "*", 
+        origin: allowedOrigins, 
         methods: ['GET', 'POST']
     }
 });
 
 // Middleware
 app.use(cors({
-  origin: "*",
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json()); // Parse JSON bodies
@@ -75,5 +79,3 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-
