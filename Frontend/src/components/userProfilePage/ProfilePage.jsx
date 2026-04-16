@@ -8,8 +8,17 @@ import GlobalContext from "../../context/GlobalContext";
 import useUserDetails from "../hooks/useUserDetails";
 import EditProfileModal from "./EditProfileModal";
 import ProblemContext from "../../context/ProblemContext";
+import axios from "axios";
+import { serverUrl } from "../../constants";
+import { useLocation } from "react-router-dom";
+
+const location = useLocation();
+
 
 const ProfilePage = () => {
+  const [role, setRole] = useState("");
+const [about, setAbout] = useState("");
+const [profilePhoto, setProfilePhoto] = useState(null);
   const { username } = useParams();
   const { user, loading } = useUserDetails(username);
   // console.log(user);
