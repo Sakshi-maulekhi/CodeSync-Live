@@ -12,10 +12,11 @@ import axios from "axios";
 import { serverUrl } from "../../constants";
 import { useLocation } from "react-router-dom";
 
-const location = useLocation();
+
 
 
 const ProfilePage = () => {
+  const location = useLocation();
   const [role, setRole] = useState("");
 const [about, setAbout] = useState("");
 const [profilePhoto, setProfilePhoto] = useState(null);
