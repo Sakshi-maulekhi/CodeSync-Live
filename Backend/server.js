@@ -16,16 +16,19 @@ const socketHandler = require('./socket/socketHandler');
 const app = express();
 const server = http.createServer(app);
 
-// Attach Socket.io to the same HTTP server
+
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000', // Adjust this to match your frontend URL in production
+        origin: "*", 
         methods: ['GET', 'POST']
     }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  credentials: true
+}));
 app.use(express.json()); // Parse JSON bodies
 
 // Database connection
