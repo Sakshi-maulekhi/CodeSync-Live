@@ -25,7 +25,7 @@ const Hero = () => {
             </h1>
 
             <p className="text-lg lg:text-2xl mb-8 text-gray-200">
-              Code Connect: Collaborative coding excellence, uniting
+              CodeSync: Collaborative coding excellence, uniting
               minds for superior solutions.
             </p>
 

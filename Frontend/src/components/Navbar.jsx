@@ -86,7 +86,7 @@ export default function Navbar() {
                     src="mainLogo2.png"
                     alt="logo"
                   />
-                  Code Connect
+                  CodeSync
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
