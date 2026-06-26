@@ -86,73 +86,70 @@ setAttemptedList(newAttempted);
   console.log(statusList, attemptedList);
   return (
     <>
-      <div className="overflow-hidden">
-        <table className="min-w-full">
-          <thead className="bg-gray border-b">
+      <div className="overflow-hidden border border-slate-800/80 rounded-xl bg-slate-950/20 backdrop-blur-sm shadow-xl">
+        <table className="min-w-full divide-y divide-slate-850">
+          <thead className="bg-slate-900/60 backdrop-blur-md">
             <tr>
               <th
                 scope="col"
-                className="text-sm font-medium text-white px-6 py-4 text-left"
+                className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4 text-left"
               >
                 Status
               </th>
               <th
                 scope="col"
-                className="text-sm font-medium text-white px-6 py-4 text-left"
+                className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4 text-left"
               >
                 Title
               </th>
 
               <th
                 scope="col"
-                className="text-sm font-medium text-white px-6 py-4 text-left"
+                className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4 text-left"
               >
                 Solution
               </th>
               <th
                 scope="col"
-                className="text-sm font-medium text-white px-6 py-4 text-left"
+                className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4 text-left"
               >
                 Difficulty
               </th>
               <th
                 scope="col"
-                className="text-sm font-medium text-white px-6 py-4 text-left"
+                className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4 text-left"
               >
                 Tags
               </th>
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="divide-y divide-slate-800/50 bg-slate-950/10">
             {filteredProblems.map((problem, index) => (
               <tr
                 key={uuidv4()}
-                className={`border-b hover:text-green hover:bg-gray-800 ${index % 2 === 0 ? "bg-black" : "bg-neutral-800"
-                  }  `}
+                className="hover:bg-indigo-600/5 transition-colors duration-150"
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                  {/* {problem.status} */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {attemptedList.includes(problem.id) ? (
-                    <ShowChartIcon className="mr-2 text-red-500 border rounded-full border-red-500 p-[1px]" />
+                    <ShowChartIcon className="mr-2 text-rose-500 border rounded-full border-rose-500/30 p-[1px]" />
                   ) : (
                     <CheckCircleOutlineIcon
                       style={{
                         color: statusList.includes(problem.id)
-                          ? "green"
-                          : "inherit",
+                          ? "#10b981"
+                          : "#475569",
                       }}
                     />
                   )}
                 </td>
-                <td className="text-sm text-white font-light px-6 py-4 whitespace-nowrap">
+                <td className="text-sm font-medium px-6 py-4 whitespace-nowrap">
                   <Link
                     relative="path"
                     to={
                       singleMode
                         ? `/problems/${problem.id}`
-                        : // : `problems/ ${problem.id}`
-                        getProblemLink(problem.id)
+                        : getProblemLink(problem.id)
                     }
                     onClick={() => {
                       if (socket && roomId) {
@@ -162,34 +159,42 @@ setAttemptedList(newAttempted);
                         });
                       }
                     }}
-                    className="hover:text-blue-600"
+                    className="text-slate-200 hover:text-blue-400 transition-colors duration-150"
                   >
                     {problem.id + ". " + problem.title}
                   </Link>
                 </td>
 
-                <td className="text-sm text-white font-light px-6 py-4 whitespace-nowrap">
-                  <a href={problem.video} target="_blank" rel="noreferrer">
-                    {" "}
-                    {/* {problem.solution} */}
-                    <YouTubeIcon className="hover:text-red-500" />
+                <td className="text-sm px-6 py-4 whitespace-nowrap">
+                  <a
+                    href={problem.video}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-block text-slate-400 hover:text-rose-500 hover:scale-110 transition-all duration-150"
+                  >
+                    <YouTubeIcon />
                   </a>
                 </td>
-                <td
-                  className={`text-sm font-light px-6 py-4 whitespace-nowrap ${problem.difficulty === "Easy"
-                    ? "text-green-500"
-                    : problem.difficulty === "Medium"
-                      ? "text-yellow-500"
-                      : "text-red-500"
-                    }`}
-                >
-                  {problem.difficulty}
+                <td className="text-sm px-6 py-4 whitespace-nowrap">
+                  {problem.difficulty === "Easy" ? (
+                    <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide">
+                      Easy
+                    </span>
+                  ) : problem.difficulty === "Medium" ? (
+                    <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide">
+                      Medium
+                    </span>
+                  ) : (
+                    <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide">
+                      Hard
+                    </span>
+                  )}
                 </td>
-                <td className="text-sm text-white font-light px-6 py-4 whitespace-nowrap">
+                <td className="text-sm text-white px-6 py-4 whitespace-nowrap">
                   {problem.tags.map((tag) => (
                     <span
                       key={uuidv4()}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-white mr-2"
+                      className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 mr-2 hover:border-slate-700 transition-colors duration-150"
                     >
                       {tag}
                     </span>

@@ -10,19 +10,10 @@ import EditProfileModal from "./EditProfileModal";
 import ProblemContext from "../../context/ProblemContext";
 import axios from "axios";
 import { serverUrl } from "../../constants";
-import { useLocation } from "react-router-dom";
-
-
-
 
 const ProfilePage = () => {
-  const location = useLocation();
-  const [role, setRole] = useState("");
-const [about, setAbout] = useState("");
-const [profilePhoto, setProfilePhoto] = useState(null);
   const { username } = useParams();
   const { user, loading } = useUserDetails(username);
-  // console.log(user);
   const { problems } = useContext(GlobalContext);
   const { statusList, attemptedList, setAttemptedList, setStatusList } =
     useContext(ProblemContext);
@@ -30,17 +21,8 @@ const [profilePhoto, setProfilePhoto] = useState(null);
   const [languages, setLanguages] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  const openModal = () => {
-    // console.log("Modal Test");
-    setModalIsOpen(true);
-  };
-
-  // Function to close the modal
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
-  // console.log(username);
+  const openModal = () => setModalIsOpen(true);
+  const closeModal = () => setModalIsOpen(false);
 
   useEffect(() => {
     const topicSet = new Map();
@@ -56,11 +38,9 @@ const [profilePhoto, setProfilePhoto] = useState(null);
         }
       });
     });
-    // console.log(topicSet);
     setTopics(Array.from(topicSet).map(([name, count]) => ({ name, count })));
 
     const languageSet = new Map();
-
     const languageTemp = user?.problemsSolved
       ?.filter((problem) => problem.isSolved === true)
       .map((problem) => problem.language);
@@ -71,30 +51,22 @@ const [profilePhoto, setProfilePhoto] = useState(null);
         languageSet.set(language, 1);
       }
     });
-    // console.log(languageSet);
     setLanguages(
       Array.from(languageSet).map(([name, count]) => ({ name, count }))
     );
+
     setStatusList([]);
     setAttemptedList([]);
     const solvedProblems = user?.problemsSolved;
-    // console.log(solvedProblems);
     solvedProblems?.forEach((problem) => {
-      // console.log(problem.problem.title);
       if (problem.isSolved === true) {
         setStatusList((prev) => [...prev, Number(problem.problem.id)]);
       } else {
         setAttemptedList((prev) => [...prev, Number(problem.problem.id)]);
       }
     });
-    console.log('[DEBUG] ProfilePage topics/languages/status updated', {
-      topics: topicTemp?.length,
-      languages: languageTemp?.length,
-      solvedCount: solvedProblems?.filter((p) => p.isSolved).length || 0,
-    });
-  }, [user]);
+  }, [user, setAttemptedList, setStatusList]);
 
-  // console.log(user?.problemsSolved);
   const easySolved = user?.problemsSolved?.filter(
     (problem) =>
       problem.problem.difficulty === "Easy" && problem.isSolved === true
@@ -108,21 +80,14 @@ const [profilePhoto, setProfilePhoto] = useState(null);
       problem.problem.difficulty === "Hard" && problem.isSolved === true
   ).length;
   const codeScore = easySolved * 1 + mediumSolved * 3 + hardSolved * 5;
-  const easyTotal = problems.filter(
-    (problem) => problem.difficulty === "Easy"
-  ).length;
-  const mediumTotal = problems.filter(
-    (problem) => problem.difficulty === "Medium"
-  ).length;
-  const hardTotal = problems.filter(
-    (problem) => problem.difficulty === "Hard"
-  ).length;
+  const easyTotal = problems.filter((problem) => problem.difficulty === "Easy").length;
+  const mediumTotal = problems.filter((problem) => problem.difficulty === "Medium").length;
+  const hardTotal = problems.filter((problem) => problem.difficulty === "Hard").length;
   const questionsTrack = {
     totalQuestions: {
       total: problems.length,
       solved: easySolved + mediumSolved + hardSolved,
     },
-
     easy: { total: easyTotal, solved: easySolved },
     medium: { total: mediumTotal, solved: mediumSolved },
     hard: { total: hardTotal, solved: hardSolved },
@@ -130,330 +95,283 @@ const [profilePhoto, setProfilePhoto] = useState(null);
   const calculatePercentage = (count, total) => {
     return (count / total) * 100;
   };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-300">
+        Loading profile...
+      </div>
+    );
   }
+
   function toDate(submittedOn) {
-  if (!submittedOn) return "";
+    if (!submittedOn) return "";
 
-  const date = new Date(submittedOn); // works for MongoDB ISO string
-  const now = new Date();
+    const date = new Date(submittedOn);
+    const now = new Date();
+    const diffInMillis = now - date;
+    const diffInSeconds = Math.floor(diffInMillis / 1000);
 
-  const diffInMillis = now - date;
-  const diffInSeconds = Math.floor(diffInMillis / 1000);
-
-  if (diffInSeconds < 60) {
-    return "Just now";
-  } else if (diffInSeconds < 3600) {
-    const minutes = Math.floor(diffInSeconds / 60);
-    return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
-  } else if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600);
-    return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
-  } else {
-    const days = Math.floor(diffInSeconds / 86400);
-    return `${days} day${days !== 1 ? "s" : ""} ago`;
-  }
-}
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const res = await axios.put(
-    `${serverUrl}/api/users/profile/${localStorage.getItem("username")}`,
-    {
-      role,
-      location,
-      about,
-      profilePhoto
+    if (diffInSeconds < 60) {
+      return "Just now";
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days !== 1 ? "s" : ""} ago`;
     }
-  );
+  }
 
-  // Dispatch event so profile updates immediately
-  window.dispatchEvent(
-    new CustomEvent("userProfileUpdated", {
-      detail: res.data,
-    })
-  );
+  const handleSubmit = async (formData) => {
+    const { role, location, about, profilePhoto } = formData;
+    const res = await axios.put(
+      `${serverUrl}/api/users/profile/${localStorage.getItem("username")}`,
+      {
+        role,
+        location,
+        about,
+        profilePhoto,
+      }
+    );
 
-  closeModal();
-};
-  // console.log(statusList, attemptedList);
-  // console.log(statusList.length, attemptedList.length);
+    window.dispatchEvent(
+      new CustomEvent("userProfileUpdated", {
+        detail: res.data,
+      })
+    );
+
+    closeModal();
+  };
+
   return (
     <>
-      {<EditProfileModal handleSubmit={handleSubmit} />}
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black py-10">
-  <div className="max-w-7xl mx-auto px-6">
-          <div className="md:flex no-wrap md:-mx-2 ">
-            {/* <!-- Left Side --> */}
-            <div className="w-full md:w-3/12 md:mx-2">
-              {/* <!-- Profile Card --> */}
-              <div className="bg-gray-800 p-3 border-t-4 border-green-400 rounded-lg">
-                <div className="image overflow-hidden border-bottom">
-                  <img
-                    className="h-52 w-52 rounded-full mx-auto border-x-gray-300 border-y-gray-800 border-4"
-                    src={`https://api.dicebear.com/7.x/bottts/svg?seed=${localStorage.getItem(
-                      "username"
-                    )}`}
-                    alt=""
-                  />
-                </div>
-                <div className="relative">
-                  {/* <h2 className="absolute right-0  p-2">
-                    <span className="text-green-600 ">Rank</span>{" "}
-                    <span className="text-green-400 font-semibold">23</span>
-                  </h2> */}
-                </div>
-                <h1 className="text-white font-bold text-xl leading-8 my-1 uppercase">
-                  {user?.name}
-                </h1>
-                <p className="text-sm text-gray-200 hover:text-gray-100 leading-6">
-                  {user?.userDescription}
+      <EditProfileModal
+        isOpen={modalIsOpen}
+        closeModal={closeModal}
+        onSubmit={handleSubmit}
+      />
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.2),_transparent_28%),linear-gradient(135deg,_#020617_0%,_#0f172a_45%,_#111827_100%)] py-10 text-slate-100">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 rounded-3xl border border-slate-800/80 bg-slate-950/60 p-6 shadow-2xl shadow-slate-950/60 backdrop-blur-xl">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="mb-2 text-sm font-semibold uppercase tracking-[0.35em] text-blue-400">
+                  Profile overview
                 </p>
-                <div className="flex items-center mt-4 text-gray-400">
-                  <svg className="h-6 w-6 fill-current" viewBox="0 0 512 512">
-                    <path d="M239.208 343.937c-17.78 10.103-38.342 15.876-60.255 15.876-21.909 0-42.467-5.771-60.246-15.87C71.544 358.331 42.643 406 32 448h293.912c-10.639-42-39.537-89.683-86.704-104.063zM178.953 120.035c-58.479 0-105.886 47.394-105.886 105.858 0 58.464 47.407 105.857 105.886 105.857s105.886-47.394 105.886-105.857c0-58.464-47.408-105.858-105.886-105.858zm0 186.488c-33.671 0-62.445-22.513-73.997-50.523H252.95c-11.554 28.011-40.326 50.523-73.997 50.523z" />
-                    <g>
-                      <path d="M322.602 384H480c-10.638-42-39.537-81.691-86.703-96.072-17.781 10.104-38.343 15.873-60.256 15.873-14.823 0-29.024-2.654-42.168-7.49-7.445 12.47-16.927 25.592-27.974 34.906C289.245 341.354 309.146 364 322.602 384zM306.545 200h100.493c-11.554 28-40.327 50.293-73.997 50.293-8.875 0-17.404-1.692-25.375-4.51a128.411 128.411 0 0 1-6.52 25.118c10.066 3.174 20.779 4.862 31.895 4.862 58.479 0 105.886-47.41 105.886-105.872 0-58.465-47.407-105.866-105.886-105.866-37.49 0-70.427 19.703-89.243 49.09C275.607 131.383 298.961 163 306.545 200z" />
-                    </g>
-                  </svg>
-                  <h1 className="px-2 text-sm">{user?.designation}</h1>
-                </div>
-                <div className="flex items-center mt-4 text-gray-400">
-                  <svg className="h-6 w-6 fill-current" viewBox="0 0 512 512">
-                    <path d="M256 32c-88.004 0-160 70.557-160 156.801C96 306.4 256 480 256 480s160-173.6 160-291.199C416 102.557 344.004 32 256 32zm0 212.801c-31.996 0-57.144-24.645-57.144-56 0-31.357 25.147-56 57.144-56s57.144 24.643 57.144 56c0 31.355-25.148 56-57.144 56z" />
-                  </svg>
-                  <h1 className="px-2 text-sm">{user?.location}</h1>
-                </div>
-                <div className="flex items-center mt-4 text-gray-400">
-                  <svg className="h-6 w-6 fill-current" viewBox="0 0 512 512">
-                    <path d="M437.332 80H74.668C51.199 80 32 99.198 32 122.667v266.666C32 412.802 51.199 432 74.668 432h362.664C460.801 432 480 412.802 480 389.333V122.667C480 99.198 460.801 80 437.332 80zM432 170.667L256 288 80 170.667V128l176 117.333L432 128v42.667z" />
-                  </svg>
-                  <h1 className="px-2 text-sm">{user?.email}</h1>
-                </div>
-                <button
-                  className="w-full cursor-pointer text-white bg-green-500 hover:bg-green-600 py-2 px-3 mt-3 rounded shadow-sm text-center"
-                  onClick={openModal}
-                >
-                  <i className="fa-solid fa-pen mr-2" />
-                  Edit Profile
-                </button>
-                {modalIsOpen && (
-                  <EditProfileModal
-                    isOpen={modalIsOpen}
-                    closeModal={closeModal}
-                  />
-                )}
-                {/* <div className="cursor-pointer text-white bg-green-500 hover:bg-green-600 py-2 px-3 mt-3 rounded shadow-sm text-center">
-                  <i className="fa-solid fa-pen mr-2"></i>Edit Profile
-                </div>
-                <EditProfileModal
-                  isOpen={modalIsOpen}
-                  closeModal={closeModal}
-                /> */}
+                <h1 className="text-3xl font-bold text-white sm:text-4xl">
+                  {user?.name || username}
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+                  {user?.userDescription || "Keep sharpening your problem-solving craft and track your growth here."}
+                </p>
               </div>
-              {/* <!-- End of profile card --> */}
-              <div className="my-4"></div>
-              {/* <!-- Topics card --> */}
-              <div className="bg-gray-800 p-3 hover:shadow rounded-lg">
-                <div className="flex items-center space-x-3 font-semibold text-white text-xl leading-8 mb-4">
-                  <span className="text-green-500">
-                    <i className="fa-solid fa-list-check"></i>
-                  </span>
-                  <span>Topics</span>
-                </div>
-                {topics.map((topic, index) => (
-                  <span className="mr-4 leading-10 inline-block" key={index}>
-                    <span className="px-2 py-1 bg-gray-600 rounded text-main-color">
-                      {topic.name}
-                    </span>
-                    <span> x {topic.count}</span>
-                  </span>
-                ))}
-              </div>
-              {/* <!-- End of Topics card --> */}
-              <div className="my-4"></div>
-              {/* <!-- Languages card --> */}
-              <div className="bg-gray-800 p-3 hover:shadow rounded-lg">
-                <div className="flex items-center space-x-3 font-semibold text-white text-xl leading-8 mb-4">
-                  <span className="text-green-500">
-                    <i className="fa-solid fa-code"></i>
-                  </span>
-                  <span>Languages</span>
-                </div>
-                {languages.map((language, index) => (
-                  <div className="mb-2  flex flex-row">
-                    <div className="px-2 py-1 bg-gray-600 rounded text-main-color">
-                      {language.name}
-                    </div>
-                    <div className="ml-auto">
-                      {" "}
-                      {language.count} problems solved
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* <!-- End of Languages card --> */}
+              <button
+                onClick={openModal}
+                className="inline-flex items-center justify-center rounded-full border border-blue-500/30 bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-blue-500/30"
+              >
+                <i className="fa-solid fa-pen mr-2" />
+                Edit Profile
+              </button>
             </div>
-            {/* <!-- Right Side --> */}
-            <div className="my-4"></div>
+          </div>
 
-            <div className="w-full md:w-9/12 mx-2 h-64">
-              {/* <!-- Progress tab --> */}
-
-              {/* <!-- Question progress --> */}
-
-              <div className="flex flex-row bg-gray-1000">
-                <div className="bg-gray-800 p-3 shadow-sm rounded-lg mr-2 flex">
-                  <div className="flex justify-between">
-                    {/* <!-- Circular Progress Bar --> */}
-                    <div className="my-auto">
-                      <CircularProgress
-                        calculatePercentage={calculatePercentage}
-                        solved={questionsTrack.totalQuestions.solved}
-                        total={questionsTrack.totalQuestions.total}
-                      />
-                    </div>
-                    <div className=" my-auto rounded flex-col">
-                      <div className="w-[200px]  bg-slate-700 mb-3 rounded px-2 py-2 ">
-                        Coding Score: {codeScore}
-                      </div>
-                      <div className="w-[200px] bg-slate-700 mt-3 rounded px-2 py-2 text-sm ">
-                        <div className="text-green-400">
-                          Accepted Submissions: {statusList.length}
-                        </div>
-                        <div className="text-red-400">
-                          Wrong Submissions: {attemptedList.length}
-                        </div>
-                      </div>
-                    </div>
-                    {/* <!-- Circular Progress Bar End --> */}
-                  </div>
+          <div className="grid gap-6 xl:grid-cols-[320px,1fr]">
+            <div className="space-y-6">
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/60 backdrop-blur-xl">
+                <div className="flex flex-col items-center text-center">
+                  <img
+                    className="h-28 w-28 rounded-full border-4 border-slate-700 object-cover shadow-lg shadow-slate-950/60"
+                    src={`https://api.dicebear.com/7.x/bottts/svg?seed=${localStorage.getItem("username")}`}
+                    alt="profile"
+                  />
+                  <h2 className="mt-4 text-2xl font-semibold text-white">
+                    {user?.name}
+                  </h2>
+                  <p className="mt-2 text-sm font-medium text-blue-400">
+                    {user?.designation || "Aspiring problem solver"}
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    {user?.userDescription || "A calm, consistent coder building momentum one problem at a time."}
+                  </p>
                 </div>
 
-                <div className="bg-gray-800 p-3 shadow-sm rounded-lg flex ml-2 w-full">
-                  {/* <!-- Difficulty Pie Chart --> */}
-                  <div className="my-auto mx-[-30px] ">
-                    <ApexChart
-                      easy={questionsTrack.easy.solved}
-                      medium={questionsTrack.medium.solved}
-                      hard={questionsTrack.hard.solved}
-                    />
+                <div className="mt-6 space-y-3 text-sm text-slate-300">
+                  <div className="flex items-center rounded-2xl border border-slate-800/80 bg-slate-900/70 px-3 py-3">
+                    <i className="fa-solid fa-user-group mr-3 text-blue-400" />
+                    <span>{user?.location || "Undisclosed location"}</span>
                   </div>
-                  {/* <!-- Difficulty Pie Chart End --> */}
-                  {/* <!-- Difficulty Progress Bar --> */}
-                  <div className="flex-1">
-                    <DifficultyProgressBar
-                      questionsTrack={questionsTrack}
-                      calculatePercentage={calculatePercentage}
-                    />
+                  <div className="flex items-center rounded-2xl border border-slate-800/80 bg-slate-900/70 px-3 py-3">
+                    <i className="fa-solid fa-envelope mr-3 text-blue-400" />
+                    <span>{user?.email || "No email available"}</span>
                   </div>
-                  {/* <!-- Difficulty Progress Bar End --> */}
                 </div>
               </div>
 
-              {/* <!-- Question progress End --> */}
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/60 backdrop-blur-xl">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="rounded-full bg-emerald-500/10 p-2 text-emerald-400">
+                    <i className="fa-solid fa-list-check" />
+                  </span>
+                  <h3 className="text-lg font-semibold text-white">Topics</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {topics.length > 0 ? (
+                    topics.map((topic, index) => (
+                      <span
+                        key={index}
+                        className="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1.5 text-sm text-slate-300"
+                      >
+                        {topic.name} <span className="ml-1 text-emerald-400">x{topic.count}</span>
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-400">No topics tracked yet.</p>
+                  )}
+                </div>
+              </div>
 
-              <div className="my-4"></div>
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/60 backdrop-blur-xl">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="rounded-full bg-violet-500/10 p-2 text-violet-400">
+                    <i className="fa-solid fa-code" />
+                  </span>
+                  <h3 className="text-lg font-semibold text-white">Languages</h3>
+                </div>
+                <div className="space-y-2">
+                  {languages.length > 0 ? (
+                    languages.map((language, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between rounded-2xl border border-slate-800/80 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-300"
+                      >
+                        <span>{language.name}</span>
+                        <span className="text-slate-400">{language.count} solved</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-400">No language data yet.</p>
+                  )}
+                </div>
+              </div>
+            </div>
 
-              {/* <!-- Heat map --> */}
-              <div className="bg-gray-800 p-3 shadow-sm rounded-lg mt-5">
+            <div className="space-y-6">
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/60 backdrop-blur-xl">
+                <div className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+                  <div className="rounded-2xl border border-slate-800/70 bg-slate-900/70 p-4">
+                    <div className="flex flex-wrap items-center gap-4">
+                      <div className="flex-shrink-0">
+                        <CircularProgress
+                          calculatePercentage={calculatePercentage}
+                          solved={questionsTrack.totalQuestions.solved}
+                          total={questionsTrack.totalQuestions.total}
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
+                          Coding Score: {codeScore}
+                        </div>
+                        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/60 px-3 py-2 text-sm text-slate-300">
+                          <div className="text-emerald-400">Accepted: {statusList.length}</div>
+                          <div className="mt-1 text-rose-400">Wrong: {attemptedList.length}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-800/70 bg-slate-900/70 p-4">
+                    <div className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-slate-400">
+                      <i className="fa-solid fa-chart-pie text-blue-400" />
+                      Difficulty split
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <ApexChart
+                        easy={questionsTrack.easy.solved}
+                        medium={questionsTrack.medium.solved}
+                        hard={questionsTrack.hard.solved}
+                      />
+                      <div className="flex-1">
+                        <DifficultyProgressBar
+                          questionsTrack={questionsTrack}
+                          calculatePercentage={calculatePercentage}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/60 backdrop-blur-xl">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Activity heatmap</h3>
+                    <p className="text-sm text-slate-400">Your consistency is showing.</p>
+                  </div>
+                </div>
                 <Heatmap heatmapData={user?.heatmapData} />
               </div>
 
-              {/* <!-- List of solved question --> */}
-              <div className="bg-gray-800 p-3 shadow-sm rounded-lg mt-5">
-                <div className="grid ">
-                  <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 ">
-                        <tr>
-                          <th scope="col" className="px-6 py-3">
-                            Problem
-                          </th>
-
-                          <th scope="col" className="px-6 py-3">
-                            Difficulty
-                          </th>
-                          <th scope="col" className="px-6 py-3">
-                            Submiited on
-                          </th>
-                        </tr>
-                      </thead>
-                      {/* <tbody> */}
-                      <tbody>
-                        {user?.problemsSolved
-                          ?.sort(
-                            (a, b) =>
-                              b.submittedOn._seconds - a.submittedOn._seconds
-                          )
-
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/60 backdrop-blur-xl">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Recent submissions</h3>
+                    <p className="text-sm text-slate-400">Latest problems you engaged with.</p>
+                  </div>
+                </div>
+                <div className="overflow-hidden rounded-2xl border border-slate-800/70">
+                  <table className="min-w-full divide-y divide-slate-800/80 text-sm text-slate-300">
+                    <thead className="bg-slate-900/80 text-xs uppercase tracking-[0.25em] text-slate-400">
+                      <tr>
+                        <th className="px-4 py-3 text-left">Problem</th>
+                        <th className="px-4 py-3 text-left">Difficulty</th>
+                        <th className="px-4 py-3 text-left">Submitted on</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/70 bg-slate-950/60">
+                      {user?.problemsSolved?.length ? (
+                        [...(user?.problemsSolved || [])]
+                          .sort((a, b) => (b?.submittedOn?._seconds || 0) - (a?.submittedOn?._seconds || 0))
                           .map(({ problem, submittedOn }, index) => (
-                            <tr
-                              key={index}
-                              className={`border-b hover:text-green hover:bg-gray-800 ${
-                                index % 2 === 0
-                                  ? "bg-gray-800"
-                                  : "bg-neutral-900"
-                              }  `}
-                            >
-                              <td className="text-sm text-white font-light px-6 py-4 whitespace-nowrap">
+                            <tr key={index} className="transition-colors duration-150 hover:bg-slate-900/70">
+                              <td className="px-4 py-3">
                                 <Link
-                                  to={`/problems/ ${problem.id}`}
-                                  className="hover:text-blue-600"
+                                  to={`/problems/${problem.id}`}
+                                  className="font-medium text-slate-100 transition-colors hover:text-blue-400"
                                 >
                                   {problem.title}
                                 </Link>
                               </td>
-
-                              <td
-                                className={`text-sm font-light px-6 py-4 whitespace-nowrap ${
-                                  problem.difficulty === "Easy"
-                                    ? "text-green-500"
-                                    : problem.difficulty === "Medium"
-                                    ? "text-yellow-500"
-                                    : "text-red-500"
-                                }`}
-                              >
-                                {problem.difficulty}
+                              <td className="px-4 py-3">
+                                <span
+                                  className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                                    problem.difficulty === "Easy"
+                                      ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+                                      : problem.difficulty === "Medium"
+                                      ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
+                                      : "border-rose-500/20 bg-rose-500/10 text-rose-400"
+                                  }`}
+                                >
+                                  {problem.difficulty}
+                                </span>
                               </td>
-                              {submittedOn && (
-                                <td className="text-sm text-white font-light px-6 py-4 whitespace-nowrap">
-                                  {toDate(submittedOn)}
-                                </td>
-                              )}
+                              <td className="px-4 py-3 text-slate-400">{toDate(submittedOn)}</td>
                             </tr>
-                          ))}
-                      </tbody>
-                      {/* <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                          <th
-                            scope="row"
-                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                          >
-                            Apple MacBook Pro 17"
-                          </th>
-                          <td className="px-6 py-4">Silver</td>
-                          <td className="px-6 py-4">Laptop</td>
-                        </tr>
-
+                          ))
+                      ) : (
                         <tr>
-                          <th
-                            scope="row"
-                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                          >
-                            Apple Watch 5
-                          </th>
-                          <td className="px-6 py-4">Red</td>
-                          <td className="px-6 py-4">Wearables</td>
-                        </tr> */}
-                      {/* </tbody> */}
-                    </table>
-                  </div>
+                          <td colSpan="3" className="px-4 py-6 text-center text-slate-400">
+                            No submission history yet.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
-                {/* <!-- End of List of solved question grid --> */}
               </div>
-
-              {/* <!-- End of Progress tab --> */}
             </div>
           </div>
         </div>

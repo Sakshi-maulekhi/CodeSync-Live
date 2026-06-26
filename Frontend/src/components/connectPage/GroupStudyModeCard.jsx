@@ -50,35 +50,31 @@ const GroupStudyModeCard = () => {
   };
 
   return (
-      <div className="rounded bg-gray-800 w-1/3 flex flex-col justify-center items-center p-4 ml-4">
-        <LoginToContinue />
-      <h1 className="text-4xl">Group Study Mode</h1>
-      <img
-        src="/student.png"
-        alt="student"
-        className="mt-2"
-        onClick={copyLinkToClipboard}
-        style={{ cursor: "pointer", width: "300px", height: "200px" }}
-      />
-      <div className="my-4 text-white text-justify">
+    <div className="flex-1 max-w-md bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl flex flex-col items-center p-8 hover:border-indigo-500/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300">
+      <LoginToContinue />
+      <h2 className="text-2xl font-bold mb-4 text-slate-100 text-center">Group Study Mode</h2>
+      <div className="w-full flex justify-center mb-6">
+        <img
+          src="/student.png"
+          alt="group study mode"
+          className="rounded-lg object-contain hover:scale-105 transition-transform duration-300"
+          onClick={copyLinkToClipboard}
+          style={{ cursor: "pointer", width: "240px", height: "160px" }}
+        />
+      </div>
+      <p className="my-4 text-slate-400 text-sm leading-relaxed text-justify flex-grow">
         In Group Study Mode, students can create a room for their collaborative
         study sessions. Within these sessions, students have the ability to view
-        the codes of their peers. This enriches their learning experiences to
-        new heights. This exchange of perspectives and approaches not only
-        promotes deeper understanding but also cultivates a supportive learning
-        community. Students are unable to edit the code of other students in the
-        room.
-      </div>
-      <div className="flex">
-        <button
-          onClick={handleCreateRoom}
-          className="rounded text-white bg-blue-500 hover:bg-blue-600 mr-2 px-4 py-2"
-        >
-          <div className="text-2xl">
-            <b>Create Room</b>
-          </div>
-        </button>
-      </div>
+        the codes of their peers. This exchange of perspectives and approaches
+        promotes deeper understanding and cultivates a supportive learning
+        community. Students are unable to edit the code of other students in the room.
+      </p>
+      <button
+        onClick={handleCreateRoom}
+        className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold shadow-md hover:shadow-indigo-500/20 hover:scale-[1.02] transition-all duration-200"
+      >
+        Create Room
+      </button>
     </div>
   );
 };

@@ -61,7 +61,7 @@ export default function Navbar() {
   return (
     <Disclosure
       as="nav"
-      className={`${isProblemPage ? "hidden" : ""} bg-gray-800`}
+      className={`${isProblemPage ? "hidden" : ""} sticky top-0 z-50 backdrop-blur-md bg-slate-950/75 border-b border-slate-800/80 shadow-lg`}
     >
       {({ open }) => (
         <>
@@ -69,7 +69,7 @@ export default function Navbar() {
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
-                <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                   <span className="absolute -inset-0.5" />
                   <span className="sr-only">Open main menu</span>
                   {open ? (
@@ -80,9 +80,9 @@ export default function Navbar() {
                 </Disclosure.Button>
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div className="flex flex-shrink-0 items-center">
+                <div className="flex flex-shrink-0 items-center text-lg font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
                   <img
-                    className="w-8 h-8 mr-2 rounded-full"
+                    className="w-8 h-8 mr-2 rounded-full ring-2 ring-indigo-500/25 p-[1px]"
                     src="mainLogo2.png"
                     alt="logo"
                   />
@@ -97,9 +97,9 @@ export default function Navbar() {
                         onClick={() => setCurrentIndex(index)}
                         className={classNames(
                           index === currentIndex
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                          "rounded-md px-3 py-2 text-sm font-medium"
+                            ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 shadow-[0_0_12px_rgba(99,102,241,0.12)]"
+                            : "text-slate-300 hover:bg-slate-800/60 hover:text-white border border-transparent",
+                          "rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200"
                         )}
                         aria-current={item.current ? "page" : undefined}
                       >
@@ -110,41 +110,27 @@ export default function Navbar() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                {/* <button
-                  type="button"
-                  className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  {loggedIn ? (
-                    <BellIcon className="h-6 w-6" aria-hidden="true" />
-                  ) : null}
-                </button> */}
-
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3 z-50">
                   <div>
                     {loggedIn ? (
-                      <Menu.Button className="flex text-sm rounded-md  ">
+                      <Menu.Button className="flex text-sm rounded-md hover:opacity-95 transition-opacity">
                         <span className="sr-only">Open user menu</span>
                         <img
-                          className="h-11 w-11 mr-2 rounded-full border-2 border-sky-400 p-1"
+                          className="h-10 w-10 mr-2 rounded-full border-2 border-indigo-500/50 p-[2px] transition-all hover:border-indigo-400"
                           src={`https://api.dicebear.com/7.x/bottts/svg?seed=${localStorage.getItem(
                             "username"
                           )}`}
                           alt=""
                         />
-                        <div className="font-medium text-gray-100 my-auto">
-                          <div>{username}</div>
-                          {/* <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Joined in August 2014
-                          </div> */}
+                        <div className="font-medium text-slate-200 my-auto text-left">
+                          <div className="text-sm font-semibold">{username}</div>
                         </div>
                       </Menu.Button>
                     ) : (
                       <Link
                         to="/login"
-                        className="text-white bg-gray-600 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                        className="text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-md hover:shadow-indigo-500/20 hover:scale-[1.02] block px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
                       >
                         Login
                       </Link>
@@ -159,24 +145,24 @@ export default function Navbar() {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md  bg-gray-700 text-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ">
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-xl border border-slate-800 bg-slate-900/95 backdrop-blur-md text-white py-1 shadow-2xl focus:outline-none overflow-hidden">
                       {/* display username */}
                       <Menu.Item>
-                        <div className="z-10  bg-gray-700 divide-y   shadow border-b border-gray-400   ">
-                          <div className="px-4 py-3 text-sm ">
-                            <div>{username}</div>
-                            <div className="font-medium truncate">{email}</div>
+                        <div className="z-10 bg-slate-950/40 divide-y divide-slate-800/50 border-b border-slate-800/80">
+                          <div className="px-4 py-3 text-sm">
+                            <div className="font-semibold text-slate-200">{username}</div>
+                            <div className="font-medium text-slate-400 truncate">{email}</div>
                           </div>
                         </div>
                       </Menu.Item>
 
-                      <Menu.Item className="pt-3">
+                      <Menu.Item className="pt-2">
                         {({ active }) => (
                           <Link
                             to={`/u/${localStorage.getItem("username")}`}
                             className={classNames(
-                              active ? "bg-gray-600" : "",
-                              "block px-4 py-2 text-sm "
+                              active ? "bg-slate-800 text-white" : "text-slate-300",
+                              "block px-4 py-2 text-sm transition-colors duration-150"
                             )}
                           >
                             Your Profile
@@ -184,13 +170,13 @@ export default function Navbar() {
                         )}
                       </Menu.Item>
          
-                      <Menu.Item>
+                      <Menu.Item className="pb-1">
                         {({ active }) => (
                           <Link
                             to="/"
                             className={classNames(
-                              active ? "bg-gray-600" : "",
-                              "block px-4 py-2 text-sm "
+                              active ? "bg-slate-800 text-rose-400" : "text-slate-300",
+                              "block px-4 py-2 text-sm transition-colors duration-150"
                             )}
                             onClick={() => {
                               setLoggedIn(false);
